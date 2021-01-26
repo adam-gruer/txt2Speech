@@ -1,0 +1,100 @@
+---
+title: "demo"
+author: "Adam Gruer"
+date: "26/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Use conda environement local to this project
+reticulate::use_condaenv(here::here("conda-env"), required = TRUE)
+
+library(palmerpenguins)
+library(dplyr)
+library(magrittr)
+library(glue)
+library(reticulate)
+
+
+```
+
+## Start Python text to speech engine
+
+```{python create}
+import pyttsx3
+engine = pyttsx3.init() # object creation
+```
+
+
+## Set rate of speech
+
+```{python rate}
+""" RATE"""
+rate = engine.getProperty('rate')   # getting details of current speaking rate
+print (rate)                        #printing current voice rate
+engine.setProperty('rate', 150)     # setting up new voice rate
+ 
+```
+
+## Set volume
+
+```{python volume}
+"""VOLUME"""
+volume = engine.getProperty('volume')   #getting to know current volume level (min=0 and max=1)
+print (volume)                          #printing current volume level
+engine.setProperty('volume',0.6)    # setting up volume level  between 0 and 1
+
+```
+
+## Set voice
+
+```{python voice}
+"""VOICE"""
+voices = engine.getProperty('voices')       #getting details of current voice
+ 
+#engine.setProperty('voice', voices[0].id)  #changing index, changes voices. o for male
+engine.setProperty('voice', voices[1].id)   #changing index, changes voices. 1 for female
+```
+
+## Say something
+
+```{python say hello}
+engine.say("Hello from R Markdown!")
+engine.say('My current speaking rate is ' + str(rate))
+engine.runAndWait()
+
+```
+
+## SAy something but from an r jchunk!!
+ 
+```{r speak}
+
+py$engine$say("I'm in an R chunk. How 'bout that!!")
+py$engine$runAndWait()
+```
+
+## Summarise the penguins data with  the help of some  glue
+
+```{r Tell me how many penguins there are}
+glue("There are {summary}",
+      summary = penguins %>% 
+          count(species) %>% 
+          glue_data("{n} {species} penguins" ) %>% 
+        glue_collapse(", ", last = " and ")
+      ) %>% 
+py$engine$say()
+
+py$engine$runAndWait()
+
+```
+
+
+```{python}
+engine.stop()
+```
+ 
+
+ 
+ 
